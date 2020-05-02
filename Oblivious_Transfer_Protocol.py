@@ -118,39 +118,11 @@ class Bob_Server():
 
 		return dec
 
-def Oblivious_Transfer():
-	b = 256
-	n = 1000
-
-	data = []
-	for i in range(n):
-		data.append(rand.getrandbits(b))
-
-	index = number.getRandomRange(0,n-1)
-
-	A = Alice_Client(index)
-	B = Bob_Server(data)
-
-	public = B.generate_key(b)
-	# print(public)
-	rndm_array = A.generate_rand_array(n,public)
-
-	dec = B.decrypt_array(rndm_array)
-
-	ans = A.get_i_element(dec)
-
-
-	print("Index = "+str(index))
-	print("Data at index "+str(index)+" is "+str(data[index]))
-
-	print("What A (Client) receives = "+str(ans))
-
-	print(ans==data[index])
 
 def create_data(k,b,p):
 	data = []
 	for i in range(k):
-		data.append(rand.getrandbits(b)%p)
+		data.append(rand.getrandbits(b))
 
 	return data
 
@@ -291,16 +263,22 @@ def verify_signature(public_keys,encoded,k,n,g,p):
 
 
 
-def Routing_Scheme():
-	b = 100
-	n = 100
-	k = 5
-	e = 2
+def Routing_Scheme(data = None):
+	b = 257
+
+	if data == None:
+		k = 10
+	else:
+		k = len(data)
+	e = 5
+	n = k+e+1
 
 	# p = gensafeprime.generate(256)
-	p,g = generate_prime(2*b)
+	p,g = generate_prime(b)
 
-	data = create_data(k,b,p)
+	if data == None:
+		data = create_data(k,b,p)
+
 
 
 
@@ -334,12 +312,55 @@ def Routing_Scheme():
 
 
 
-
+	print("Data sent through channels:")
 	print(data)
+	print("Data received through channels:")
 	print(coef)
 
+	return coef
 
-Routing_Scheme()
+
+def Oblivious_Transfer():
+	b = 128
+	n = 12
+
+	data = []
+	for i in range(n):
+		data.append(rand.getrandbits(b))
+
+	index = number.getRandomRange(0,n-1)
+
+	A = Alice_Client(index)
+	B = Bob_Server(data)
+
+	public = B.generate_key(b)
+
+	rndm_array = A.generate_rand_array(n,public)
+
+	# t = list(map(list, zip(*rndm_array))) ### can uncomment to see effect of routing but makes the programme considerably slow.
+
+	# t[0] = Routing_Scheme(t[0]) ### can uncomment to see effect of routing but makes the programme considerably slow.
+	# t[1] = Routing_Scheme(t[1]) ### can uncomment to see effect of routing but makes the programme considerably slow.
+	
+	# rndm_array=list(map(lambda x, y:(x,y), t[0], t[1])) ### can uncomment to see effect of routing but makes the programme considerably slow.
+
+
+	dec = B.decrypt_array(rndm_array)
+	# dec = Routing_Scheme(dec) ####can uncomment to see effect of routing but makes the programme considerably slow.
+	
+	ans = A.get_i_element(dec)
+
+
+	print("Index = "+str(index))
+	print("Data at index "+str(index)+" is "+str(data[index]))
+
+	print("What A (Client) receives = "+str(ans))
+
+	print(ans==data[index])
+
+
+
+# Routing_Scheme()
 Oblivious_Transfer()
 
 
