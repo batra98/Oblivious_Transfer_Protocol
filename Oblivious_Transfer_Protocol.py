@@ -48,11 +48,8 @@ class Alice_Client():
 		self.random_ar = []
 
 		for i in range(n):
-			if i != self.index:
-				r = rand.getrandbits(self.b)
-			else:
-				r = self.index
-
+			
+			r = rand.getrandbits(self.b)			
 
 			self.random_ar.append(r)
 
